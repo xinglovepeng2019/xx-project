@@ -2,6 +2,8 @@ import axios from 'axios'
 
 import { Message } from 'element-ui'
 
+import store from '@/store'
+
 const service = axios.create({
   // npm run dev  值为/api  开发环境
   // npm run build 值为/prod-api  生产环境
@@ -12,6 +14,14 @@ const service = axios.create({
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
+
+  // 统一向请求头上设置token
+
+  if (store.getters.token) {
+    // 如果token存在  把token设置到请求头上
+    config.headers['Authorization']=`Bearer ${store.getters.token}`
+  }
+
   return config;
 }, function (error) {
   // 对请求错误做些什么

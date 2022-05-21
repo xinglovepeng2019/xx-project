@@ -1,11 +1,13 @@
 import {getToken,setToken,removeToken} from '@/utils/auth'
-import { login } from '@/api/user'
+import { login,getUserInfo,getUserDetailById } from '@/api/user'
 // state
 const getDefaultState = () => {
   return {
     // token: null    //token状态共享
     // token从缓存中读取
-    token:getToken()
+    token: getToken(),
+    // 初始化用户资料信息
+    userInfo:{}  //值不能是null ？？？
   }
 }
 
@@ -23,6 +25,14 @@ const mutations = {
     state.token = null  //删除vuex中的token
     // 清除缓存
     removeToken()
+  },
+  // 设置用户资料
+  setUserInfo (state, userinfo) {
+    // 使用浅拷贝  数据更新 才会触发组件更新
+    state.userInfo = {...userinfo}
+  },
+  removeUserInfo (state) {
+    state.userInfo = {}
   }
 }
 
@@ -41,6 +51,18 @@ const actions = {
 
     commit('setToken', result)
 
+  },
+  // 请求获取用户信息的方法
+ async getUserInfo ({ commit }) {
+   const res = await getUserInfo()  //发送请求获取用户信息
+   console.log(res,1)
+  //  获取用户头像  借助于上面获取到的用户的id
+   const baseInfo = await getUserDetailById(res.userId)
+   console.log(baseInfo,2)
+  //  合并数据
+   const baseResult = {...res,...baseInfo}
+   commit('setUserInfo', baseResult)  //将获取到的用户资料设置到vuex数据中
+   return res;   //？
   }
 }
 

@@ -9,6 +9,28 @@ export function login (data) {
  })
 }
 
+/* 
+获取用户基本资料
+*/
+export function getUserInfo (data) {
+  // 返回一个axios对象
+  return request({
+    url: '/sys/profile',
+    method: "post",
+    data
+ })
+  
+}
+
+/* 
+获取用户头像
+*/
+export function getUserDetailById (id) {
+  // 返回一个axios对象
+  return request({
+    url: `/sys/user/${id}`
+ })
+}
 export function getInfo(token) {
   
 }
