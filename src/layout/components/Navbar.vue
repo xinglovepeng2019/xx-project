@@ -15,7 +15,12 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="staffPhoto" class="user-avater" alt="" />
+          <img
+            v-imgerror="defaultImg"
+            :src="staffPhoto"
+            class="user-avater"
+            alt=""
+          />
           <span class="name">{{ name }}</span>
           <i class="el-icon-caret-bottom" style="color: #fff" />
         </div>
@@ -40,11 +45,19 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, createNamespacedHelpers } from "vuex";
+// 这里的mapAction直接对应模块下的action辅助函数
+const { mapActions } = createNamespacedHelpers("user");
+
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 
 export default {
+  data() {
+    return {
+      defaultImg: require("@/assets/common/head.jpg"),
+    };
+  },
   components: {
     Breadcrumb,
     Hamburger,
@@ -53,12 +66,15 @@ export default {
     ...mapGetters(["sidebar", "staffPhoto", "name"]),
   },
   methods: {
+    ...mapActions(["loginout"]),
     toggleSideBar() {
       this.$store.dispatch("app/toggleSideBar");
     },
-    async logout() {
-      await this.$store.dispatch("user/logout");
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+    logout() {
+      //  因为退出的方法是 同步的 所以不需要await
+      this.loginout();
+      // 跳转到登陆页面
+      this.$router.push("/login");
     },
   },
 };

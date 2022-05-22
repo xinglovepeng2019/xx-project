@@ -1,4 +1,4 @@
-import {getToken,setToken,removeToken} from '@/utils/auth'
+import {getToken,setToken,removeToken,setTimeStamp} from '@/utils/auth'
 import { login,getUserInfo,getUserDetailById } from '@/api/user'
 // state
 const getDefaultState = () => {
@@ -51,6 +51,9 @@ const actions = {
 
     commit('setToken', result)
 
+    // 写入时间戳
+    setTimeStamp()
+
   },
   // 请求获取用户信息的方法
  async getUserInfo ({ commit }) {
@@ -62,7 +65,14 @@ const actions = {
   //  合并数据
    const baseResult = {...res,...baseInfo}
    commit('setUserInfo', baseResult)  //将获取到的用户资料设置到vuex数据中
-   return res;   //？
+   return baseResult;   //？
+  },
+//  登出
+  loginout ({ commit }) {
+    // 删除token
+    commit('removeToken')
+    // 删除用户资料
+    commit('removeUserInfo')
   }
 }
 
