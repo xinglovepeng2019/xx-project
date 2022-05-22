@@ -10,10 +10,12 @@ export default {
       // path什么都不写的时候，表示该路由为当前二级路由的默认路由
       path: "",
       component: () => import('@/views/approvals'),
+      // 元信息  描述
       meta: {
         // meta属性的里面的属性
         // 左侧导航会读取我们的路由里的meta里面的title作为显示菜单名称
-        title:'审批'
+        title: '审批',
+        icon:'tree-table'
       }
     }
   ]

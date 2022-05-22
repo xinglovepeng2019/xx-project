@@ -7,7 +7,7 @@ import router from '@/router'
 
 import {getTimeStamp} from '@/utils/auth'
 
-// 定义超时时间
+// 定义超时时间  单位秒
 const TimeOut = 3600
 
 const service = axios.create({
@@ -61,7 +61,7 @@ service.interceptors.response.use(function (response) { //响应成功
   // 处理token失效问题
   // error 里面有response对象
   if (error.response && error.response.data && error.response.data.code === 10002) {
-    store.dispatch('user/loginout')
+    store.dispatch('user/loginout')  //清除token
     router.push('/login')
   } else {
        // 对响应错误做点什么
