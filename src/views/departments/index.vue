@@ -2,35 +2,54 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="tree-card">
-        <el-row
-          type="flex"
-          justify="space-between"
-          align="middle"
-          style="height: 40px"
+        <tree-tools :tree-node="company" :is-root="true"></tree-tools>
+
+        <el-tree
+          :data="departs"
+          :props="defaultProps"
+          :default-expand-all="true"
         >
-          <el-col>
-            <span>丁鹿学堂科技</span>
-          </el-col>
-          <el-col :span="4">
-            <el-row type="flex" justify="end">
-              <el-col>负责人</el-col>
-              <el-col>
-                <el-dropdown>
-                  <span> 操作<i class="el-icon-arrow-down"></i> </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>添加子部门</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </el-col>
-            </el-row>
-          </el-col>
-        </el-row>
+          <!-- 传入内容 插槽内容  自动循环多次  循环多个节点
+        slot-scope="对象"  作用域插槽  接收传递给插槽的数据  data每个节点对象
+         -->
+          <tree-tools slot-scope="{ data }" :tree-node="data"></tree-tools>
+        </el-tree>
       </el-card>
     </div>
   </div>
 </template>
 <script>
-export default {};
+import treeTools from "./components/tree-tools.vue";
+import { getDepartments } from "@/api/departments.js";
+import { tranListToTreeData } from "@/utils/index";
+export default {
+  components: {
+    treeTools,
+  },
+  data() {
+    return {
+      company: {
+        name: "丁鹿学堂组织架构",
+        manager: "负责人",
+      },
+      defaultProps: {
+        label: "name",
+      },
+      departs: [],
+    };
+  },
+  created() {
+    this.getDepartments();
+  },
+  methods: {
+    async getDepartments() {
+      let result = await getDepartments();
+      // console.log(result, "组织");
+      // console.log(result.depts, 888);
+      this.departs = tranListToTreeData(result.depts, "");
+    },
+  },
+};
 </script>
 <style scoped>
 .tree-card {

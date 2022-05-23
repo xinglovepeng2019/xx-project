@@ -41,6 +41,7 @@ const actions = {
 
   async login ({ commit }, data) {
     const result = await login(data)   //就是一个promise result就是执行的结果
+    
     // axios默认给数据加了一层data
     // if (result.data.success) {
       // 登陆接口调用成功 意味着用户名和密码是正确的
