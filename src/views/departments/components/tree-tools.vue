@@ -59,6 +59,8 @@ export default {
         this.$emit("addDepts", this.treeNode);
       } else if (type === "edit") {
         // 编辑
+        // 传递当前点击的部门数据
+        this.$emit("editDepts", this.treeNode);
       } else {
         // 删除
         this.$confirm("确定要删除该部门吗?")

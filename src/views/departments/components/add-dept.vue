@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新增部门" :visible.sync="showDialog">
+  <el-dialog :title="showTitle" :visible.sync="showDialog">
     <!-- 表单组件 -->
     <el-form
       ref="deptForm"
@@ -51,7 +51,7 @@
         <el-button type="primary" size="small" @click="submitForm('deptForm')"
           >确定</el-button
         >
-        <el-button size="small">取消</el-button>
+        <el-button size="small" @click="resetForm('deptForm')">取消</el-button>
       </el-col>
     </el-row>
   </el-dialog>
@@ -61,6 +61,8 @@ import {
   getDepartments,
   getEmployeeSimple,
   addDepartments,
+  getDepartDetail,
+  updateDepartments,
 } from "@/api/departments";
 export default {
   props: {
@@ -79,15 +81,28 @@ export default {
     const checkNameRepet = async (rule, value, callback) => {
       // value 部门名称 要去和同级别下的部门去比较  有相同不可以
       const { depts } = await getDepartments();
+      // 检查重复规则，支持两种模式  新增模式/编辑模式
       // 去找同级下有没有和value相同的数据
       // 找同级下所有的子部门
-      const isRepeat = depts
-        .filter((item) => item.pid === this.treeNode.id)
-        .some((item) => item.name === value);
-      // isRepeat 为true  找到了一样的名字
 
+      let isRepeat = false;
+      if (this.formData.id) {
+        // 编辑模式
+        // 编辑 上海事业部  ==》除了我之外，同级部门下不能有叫上海事业部的
+        isRepeat = depts
+          .filter(
+            (item) =>
+              item.id !== this.formData.id && item.pid === this.treeNode.pid
+          )
+          .some((item) => item.name === value);
+      } else {
+        //新增模式
+        isRepeat = depts
+          .filter((item) => item.pid === this.treeNode.pid)
+          .some((item) => item.name === value);
+      }
       isRepeat
-        ? callback(new Error(`同级部门下已经存在这个${value}部门了`))
+        ? callback(new Error(`同级部门下已经有${value}的部门了`))
         : callback();
     };
     // 检查部门编号是否重复
@@ -97,7 +112,15 @@ export default {
       // 去找同级下有没有和value相同的数据
       // 找同级下所有的子部门
       // value不能为空，因为我们的部门有可能没有code
-      const isRepeat = depts.some((item) => item.code === value && value);
+      let isRepeat = false;
+      if (this.formData.id) {
+        isRepeat = depts.some(
+          (item) => item.id !== this.formData.id && item.code === value && value
+        );
+      } else {
+        isRepeat = depts.some((item) => item.code === value && value);
+      }
+
       // isRepeat 为true  找到了一样的名字
 
       isRepeat
@@ -151,21 +174,55 @@ export default {
       peoples: [], //部门负责人
     };
   },
+  computed: {
+    showTitle() {
+      return this.formData.id ? "编辑部门" : "新增部门";
+    },
+  },
   methods: {
+    async getDepartDetail(id) {
+      // 获取部门详细信息
+      this.formData = await getDepartDetail(id);
+      console.log(this.formData, "this.formData");
+    },
+    // 获取部门负责人数据
     async getEmployeeSimple() {
       this.peoples = await getEmployeeSimple();
+    },
+    resetForm(formName) {
+      this.formData = {
+        code: "",
+        introduce: "",
+        manager: "",
+        name: "",
+      };
+      //取消按钮
+      this.$refs[formName].resetFields(); //重置校验字段
+      this.$emit("update:showDialog", false);
     },
     submitForm(formName) {
       //新增
       this.$refs[formName].validate(async (isOk) => {
         if (isOk) {
-          // 提交
-          await addDepartments({ ...this.formData, pid: this.treeNode.id });
-
+          //  区分编辑和新增
+          if (this.formData.id) {
+            // 编辑模式
+            await updateDepartments(this.formData);
+          } else {
+            // 新增模式
+            // 提交
+            await addDepartments({ ...this.formData, pid: this.treeNode.id });
+          }
           // 告诉父组件 重新拉取数据
           this.$emit("addDepts");
 
           this.$emit("update:showDialog", false); //触发事件
+          this.formData = {
+            code: "",
+            introduce: "",
+            manager: "",
+            name: "",
+          };
         } else {
           console.log("error submit!!");
           return false;

@@ -2,7 +2,11 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="tree-card">
-        <tree-tools :tree-node="company" :is-root="true"></tree-tools>
+        <tree-tools
+          :tree-node="company"
+          @addDepts="addDepts"
+          :is-root="true"
+        ></tree-tools>
 
         <el-tree
           :data="departs"
@@ -17,14 +21,16 @@
             @delDepts="getDepartments"
             :tree-node="data"
             @addDepts="addDepts"
+            @editDepts="editDepts"
           ></tree-tools>
         </el-tree>
       </el-card>
 
       <add-dept
-        @addDepts="addDepts"
+        @addDepts="getDepartments"
         :tree-node="node"
         :show-dialog.sync="showDialog"
+        ref="addDept"
       ></add-dept>
     </div>
   </div>
@@ -58,6 +64,15 @@ export default {
     this.getDepartments();
   },
   methods: {
+    editDepts(node) {
+      // 编辑部门节点   node当前部门节点
+      // 弹窗显示
+      this.showDialog = true;
+      // 赋值当前点击的节点  为了确定编辑
+      this.node = node;
+      //调用子组件的方法  传入id
+      this.$refs.addDept.getDepartDetail(node.id);
+    },
     // getDialog(value) {
     //   this.showDialog = value;
     // },
@@ -67,6 +82,7 @@ export default {
       // node 是当前点击的部门，要记录下来
       this.node = node;
     },
+    // 获取组织架构数据
     async getDepartments() {
       let result = await getDepartments();
       console.log(result, "组织");
