@@ -12,6 +12,9 @@ import App from './App'
 import store from './store'
 import router from './router'
 
+import PageTools from '@/components/PageTools'
+Vue.component('PageTools',PageTools)
+
 import '@/icons' // icon
 import '@/permission' // permission control
 
@@ -21,9 +24,18 @@ import * as directives from '@/directives'
 
 Object.keys(directives).forEach(key => {
   // key就是指令的名称
-  console.log(key, "key")
+  // console.log(key, "key")
   // 全局注册自定义指令
   Vue.directive(key,directives[key])
+})
+
+// 过滤器
+
+import * as filters from '@/filters' 
+console.log(filters,"filres")
+// 注册全局过滤器
+Object.keys(filters).forEach(key => {
+  Vue.filter(key,filters[key])
 })
 
 /**
