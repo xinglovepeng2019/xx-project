@@ -6,9 +6,13 @@
           <span>共16条记录</span>
         </template>
         <template slot="after">
-          <el-button size="small">excel导入</el-button>
+          <el-button size="small" @click="$router.push('/import?type=user')"
+            >excel导入</el-button
+          >
           <el-button size="small">excel导出</el-button>
-          <el-button size="small">新增员工</el-button>
+          <el-button size="small" @click="showDialog = true"
+            >新增员工</el-button
+          >
         </template>
       </page-tools>
       <!-- 表格 -->
@@ -68,7 +72,8 @@
       </el-row>
     </div>
 
-    <add-employee></add-employee>
+    <!-- sync修饰符是子组件改变父组件的数据的一个语法糖 -->
+    <add-employee :show-dialog.sync="showDialog"></add-employee>
   </div>
 </template>
 <script>
@@ -80,6 +85,7 @@ export default {
   },
   data() {
     return {
+      showDialog: false, //控制弹层的显示隐藏
       list: [],
       page: {
         page: 1,

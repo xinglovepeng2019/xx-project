@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="新增员工" :visible.sync="showDialog">
-    <el-form :model="formData" :rules="rules">
+    <el-form :model="formData" :rules="rules" ref="addEmployee">
       <el-form-item label="姓名" prop="username">
         <el-input
           style="width: 50%"
@@ -27,7 +27,14 @@
           style="width: 50%"
           v-model="formData.formOfEmployment"
           placeholder="请选择"
-        ></el-select>
+        >
+          <el-option
+            v-for="item in EmployeeEnum.hireType"
+            :key="item.id"
+            :label="item.value"
+            :value="item.id"
+          ></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="工号" prop="workNumber">
         <el-input
@@ -41,7 +48,17 @@
           style="width: 50%"
           v-model="formData.departmentName"
           placeholder="请输入部门"
+          @focus="getDepartments"
         ></el-input>
+        <el-tree
+          v-if="showTree"
+          v-loading="loading"
+          :data="treeData"
+          default-expand-all
+          :props="{ label: 'name' }"
+          @node-click="selectNode"
+        >
+        </el-tree>
       </el-form-item>
       <el-form-item label="转正时间">
         <el-date-picker
@@ -52,13 +69,17 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button>取 消</el-button>
-      <el-button type="primary">确 定</el-button>
+      <el-button @click="btnCancel">取 消</el-button>
+      <el-button type="primary" @click="btnOk">确 定</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import { getDepartments } from "@/api/departments";
+import { addEmployee } from "@/api/employees";
+import { tranListToTreeData } from "@/utils";
+import EmployeeEnum from "@/api/constant/employees";
 export default {
   props: {
     showDialog: {
@@ -68,6 +89,10 @@ export default {
   },
   data() {
     return {
+      EmployeeEnum, //聘用形式数据
+      treeData: [], //定义数组接收树形数据 --部门数据
+      showTree: false, //控制树形数据的显示隐藏
+      loading: false, //控制树的显示和隐藏的进度条
       formData: {
         username: "",
         mobile: "",
@@ -106,6 +131,50 @@ export default {
         timeOfEntry: [{ required: true, message: "入职时间", trigger: "blur" }],
       },
     };
+  },
+  methods: {
+    async getDepartments() {
+      this.showTree = true;
+      this.loading = true;
+      const { depts } = await getDepartments();
+      // depts转换树形数据
+      this.treeData = tranListToTreeData(depts, "");
+      this.loading = false;
+    },
+    selectNode(node) {
+      // 点击tree的节点时触发
+      this.formData.departmentName = node.name;
+      this.showTree = false;
+    },
+    async btnOk() {
+      // 点击确定 校验整个表单
+      try {
+        await this.$refs.addEmployee.validate();
+        // 调用新增接口
+        await addEmployee(this.formData);
+        // 告诉父组件更新数据
+        // this.$parent;可以直接调用到父组件的实例  就是父组件的this
+        // this.$emit
+        this.$parent.getEmployeeList();
+        this.$parent.showDialog = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    btnCancel() {
+      // 重置原来的数据
+      this.formData = {
+        username: "",
+        mobile: "",
+        formOfEmployment: "",
+        workNumber: "",
+        departmentName: "",
+        timeOfEntry: "",
+        correctionTime: "",
+      };
+      this.$refs.addEmployee.resetFields();
+      this.$emit("update:showDialog", false);
+    },
   },
 };
 </script>

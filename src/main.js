@@ -11,6 +11,7 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
+import Components from '@/components'
 
 import PageTools from '@/components/PageTools'
 Vue.component('PageTools',PageTools)
@@ -38,6 +39,9 @@ Object.keys(filters).forEach(key => {
   Vue.filter(key,filters[key])
 })
 
+
+// 注册自定义组件
+Vue.use(Components)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
