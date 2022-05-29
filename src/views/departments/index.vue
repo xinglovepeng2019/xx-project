@@ -97,4 +97,7 @@ export default {
   padding: 30px 140px;
   font-size: 14px;
 }
+/deep/ .el-tree-node__content {
+  height: 60px !important;
+}
 </style>

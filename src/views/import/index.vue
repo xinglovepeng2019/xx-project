@@ -13,6 +13,21 @@ export default {
   },
   methods: {
     async success({ header, results }) {
+      //['手机号', '姓名', '入职日期', '转正日期', '工号']
+
+      /* [
+               {入职日期: 43535
+                姓名: "高大山2"
+                工号: 20089
+                手机号: 13041139002
+                转正日期: 43719},
+                {入职日期: 43535
+                姓名: "高大山2"
+                工号: 20089
+                手机号: 13041139003
+                转正日期: 43719}
+             ] */
+
       // header中的数据 是中文 results中的数据也是中文
       // 新增的员工的属性是一致的
       // username  姓名
@@ -57,11 +72,15 @@ export default {
     },
     // 转化excel的日期格式
     formDate(numb, format) {
+      // 43535  43719
+
       const time = new Date((numb - 1) * 24 * 3600000 + 1);
+
       time.setYear(time.getFullYear() - 70);
       const year = time.getFullYear() + "";
       const month = time.getMonth() + 1 + "";
-      const date = time.getDate() - 1 + "";
+
+      const date = time.getDate() + "";
       if (format && format.length === 1) {
         return year + format + month + format + date;
       }

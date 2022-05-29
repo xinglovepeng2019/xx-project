@@ -9,7 +9,7 @@
           <el-button size="small" @click="$router.push('/import?type=user')"
             >excel导入</el-button
           >
-          <el-button size="small">excel导出</el-button>
+          <el-button size="small" @click="exportData">excel导出</el-button>
           <el-button size="small" @click="showDialog = true"
             >新增员工</el-button
           >
@@ -29,10 +29,12 @@
           prop="workNumber"
           sortable
         ></el-table-column>
+        <!-- formatter	用来格式化内容 -->
         <el-table-column
           label="聘用形式"
           prop="formOfEmployment"
           sortable
+          :formatter="formatEmployment"
         ></el-table-column>
         <el-table-column
           label="部门"
@@ -50,8 +52,13 @@
           sortable
         ></el-table-column>
         <el-table-column label="操作">
-          <template>
-            <el-button type="text" size="small">查看</el-button>
+          <template slot-scope="{ row }">
+            <el-button
+              type="text"
+              size="small"
+              @click="$router.push(`/employees/detail/${row.id}`)"
+              >查看</el-button
+            >
             <el-button type="text" size="small">转正</el-button>
             <el-button type="text" size="small">调岗</el-button>
             <el-button type="text" size="small">离职</el-button>
@@ -79,6 +86,8 @@
 <script>
 import { getEmployeeList } from "@/api/employees";
 import AddEmployee from "./components/add-employee.vue";
+import { formatDate } from "@/filters/index";
+import EmployeeEnum from "@/api/constant/employees";
 export default {
   components: {
     AddEmployee,
@@ -98,6 +107,11 @@ export default {
     this.getEmployeeList();
   },
   methods: {
+    formatEmployment(row, column, cellValue, index) {
+      //  格式化聘用形式
+      const obj = EmployeeEnum.hireType.find((item) => item.id === cellValue);
+      return obj ? obj.value : "未知";
+    },
     changepage(newpage) {
       this.page.page = newpage;
       this.getEmployeeList();
@@ -106,6 +120,55 @@ export default {
       let { total, rows } = await getEmployeeList(this.page);
       this.page.total = total;
       this.list = rows;
+    },
+    // 导出excel
+    exportData() {
+      // 表头对应的关系
+      const headers = {
+        姓名: "username",
+        手机号: "mobile",
+        入职日期: "timeOfEntry",
+        聘用形式: "formOfEmployment",
+        转正日期: "correctionTime",
+        工号: "workNumber",
+        部门: "departmentName",
+      };
+
+      // 按需加载
+      import("@/vendor/Export2Excel").then(async (excel) => {
+        // 重新获取所有的数据
+        const { rows } = await getEmployeeList({
+          page: 1,
+          size: this.page.total,
+        }); //[{}]  ==>  [[],[]]
+        const data = this.formatJson(headers, rows);
+        excel.export_json_to_excel({
+          header: Object.keys(headers),
+          data,
+          filename: "员工工资",
+          autoWidth: true,
+          bookType: "xlsx",
+        });
+      });
+    },
+    formatJson(headers, rows) {
+      // [{username:"张三"}]  ==>  [['张三'],[]]
+      return rows.map((item) => {
+        return Object.keys(headers).map((key) => {
+          if (
+            headers[key] === "timeOfEntry" ||
+            headers[key] === "correctionTime"
+          ) {
+            return formatDate(item[headers[key]]); //返回一个格式化之前的时间
+          } else if (headers[key] === "formOfEmployment") {
+            var en = EmployeeEnum.hireType.find(
+              (obj) => obj.id === item[headers[key]]
+            );
+            return en ? en.value : "未知";
+          }
+          return item[headers[key]];
+        });
+      });
     },
   },
 };
