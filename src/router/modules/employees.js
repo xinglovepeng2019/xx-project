@@ -25,6 +25,15 @@ export default {
       meta: {
         title:"员工详情"
       }
+    },
+    {
+      path: 'print/:id', //动态路由参数
+      component: () => import('@/views/employees/print'),
+      hidden: true, //不在左侧菜单显示
+      meta: {
+        title: "员工打印",
+        icon:'people'
+      }
     }
   ]
 }

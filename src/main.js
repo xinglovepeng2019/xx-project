@@ -12,8 +12,10 @@ import App from './App'
 import store from './store'
 import router from './router'
 import Components from '@/components'
-import xlsx from 'xlsx'
-console.log(xlsx,"xlsx2")
+
+
+import Print from 'vue-print-nb'
+Vue.use(Print)
 
 import PageTools from '@/components/PageTools'
 Vue.component('PageTools',PageTools)

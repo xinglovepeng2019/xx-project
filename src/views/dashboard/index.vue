@@ -1,14 +1,22 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name:</div>
+    <div class="dashboard-text">
+      name:
+
+      <image-upload></image-upload>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import imageUpload from "@/components/ImageUpload";
 
 export default {
   name: "Dashboard",
+  components: {
+    imageUpload,
+  },
   computed: {
     ...mapGetters(["name"]),
   },

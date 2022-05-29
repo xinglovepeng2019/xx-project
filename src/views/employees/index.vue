@@ -23,7 +23,22 @@
           sortable
           prop="username"
         ></el-table-column>
-        <el-table-column label="头像"></el-table-column>
+        <el-table-column label="头像">
+          <template slot-scope="{ row }">
+            <img
+              :src="row.staffPhoto"
+              v-imgerror="require('@/assets/common/bigUserHeader.png')"
+              alt=""
+              style="
+                width: 100px;
+                height: 100px;
+                padding: 10px;
+                border-radius: 50%;
+              "
+              @click="showQrCode(row.staffPhoto)"
+            />
+          </template>
+        </el-table-column>
         <el-table-column
           label="工号"
           prop="workNumber"
@@ -46,11 +61,11 @@
             {{ row.timeOfEntry | formatDate }}
           </template>
         </el-table-column>
-        <el-table-column
-          label="账号状态"
-          prop="enableState"
-          sortable
-        ></el-table-column>
+        <el-table-column label="账号状态" prop="enableState" sortable>
+          <template slot-scope="{ row }">
+            <el-switch :value="row.enableState === 1"></el-switch>
+          </template>
+        </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="{ row }">
             <el-button
@@ -81,6 +96,10 @@
 
     <!-- sync修饰符是子组件改变父组件的数据的一个语法糖 -->
     <add-employee :show-dialog.sync="showDialog"></add-employee>
+
+    <el-dialog title="二维码" :visible="showCodeDialog">
+      <el-row type="flex" justify="center"> <canvas ref="myCanvas" /> </el-row>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -88,6 +107,7 @@ import { getEmployeeList } from "@/api/employees";
 import AddEmployee from "./components/add-employee.vue";
 import { formatDate } from "@/filters/index";
 import EmployeeEnum from "@/api/constant/employees";
+import QrCode from "qrcode";
 export default {
   components: {
     AddEmployee,
@@ -101,12 +121,26 @@ export default {
         size: 10,
         total: 0,
       },
+      showCodeDialog: false, //显示二维码弹层
     };
   },
   created() {
     this.getEmployeeList();
   },
   methods: {
+    showQrCode(url) {
+      console.log(123);
+      // 点击图片显示二维码
+      if (url) {
+        this.showCodeDialog = true;
+        // 数据更新 页面的渲染时异步的
+        this.$nextTick(() => {
+          QrCode.toCanvas(this.$refs.myCanvas, url); //将地址转化为二维码
+        });
+      } else {
+        this.$message.warning("用户还未上传头像");
+      }
+    },
     formatEmployment(row, column, cellValue, index) {
       //  格式化聘用形式
       const obj = EmployeeEnum.hireType.find((item) => item.id === cellValue);
