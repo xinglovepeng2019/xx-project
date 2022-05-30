@@ -77,7 +77,9 @@
             <el-button type="text" size="small">转正</el-button>
             <el-button type="text" size="small">调岗</el-button>
             <el-button type="text" size="small">离职</el-button>
-            <el-button type="text" size="small">角色</el-button>
+            <el-button type="text" size="small" @click="editRole(row.id)"
+              >角色</el-button
+            >
             <el-button type="text" size="small">删除</el-button>
           </template>
         </el-table-column>
@@ -100,6 +102,13 @@
     <el-dialog title="二维码" :visible="showCodeDialog">
       <el-row type="flex" justify="center"> <canvas ref="myCanvas" /> </el-row>
     </el-dialog>
+
+    <!-- 角色弹层 -->
+    <assign-role
+      :userId="userId"
+      :showRoleDialog.sync="showRoleDialog"
+      ref="assignRole"
+    ></assign-role>
   </div>
 </template>
 <script>
@@ -108,9 +117,11 @@ import AddEmployee from "./components/add-employee.vue";
 import { formatDate } from "@/filters/index";
 import EmployeeEnum from "@/api/constant/employees";
 import QrCode from "qrcode";
+import assignRole from "./components/assign-role.vue";
 export default {
   components: {
     AddEmployee,
+    assignRole,
   },
   data() {
     return {
@@ -122,12 +133,21 @@ export default {
         total: 0,
       },
       showCodeDialog: false, //显示二维码弹层
+      userId: "", //点击的员工的id
+      showRoleDialog: false, //角色弹层
     };
   },
   created() {
     this.getEmployeeList();
   },
   methods: {
+    editRole(id) {
+      // 点击角色 传递员工的id  给该员工分配角色
+      this.userId = id;
+      // 调用子组件的方法  获取当前员工选中的角色
+      this.$refs.assignRole.getUserDetailById(id);
+      this.showRoleDialog = true;
+    },
     showQrCode(url) {
       console.log(123);
       // 点击图片显示二维码

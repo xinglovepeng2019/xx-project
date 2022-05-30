@@ -57,3 +57,16 @@ export function getRoleDetail (id) {
     url: `/sys/role/${id}`
  })
 }
+
+/* '
+/sys/role/assignPrem  给角色分配权限
+*/
+
+export function assignPrem (data) {
+  // 返回一个axios对象
+  return request({
+    url: `/sys/role/assignPrem`,
+    method: "put",
+    data
+ })
+}

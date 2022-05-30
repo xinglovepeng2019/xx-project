@@ -23,7 +23,7 @@ export function getUserInfo (data) {
 }
 
 /* 
-获取用户头像
+获取用户基本信息--头像--roleIds
 */
 export function getUserDetailById (id) {
   // 返回一个axios对象
