@@ -69,14 +69,16 @@ export const constantRoutes = [
       }
     ]
   },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // 404 page must be placed at the end !!!  必须放到最后
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: [...constantRoutes,...asyncRoutes]  //临时合并所有的路由
+  // 不是需要所有的动态路由，而是需要帅选出的动态路由   解除合并
+  // routes: [...constantRoutes,...asyncRoutes]  //临时合并所有的路由
+  routes: [...constantRoutes]   //只有静态路由
   // routes:constantRoutes
 })
 

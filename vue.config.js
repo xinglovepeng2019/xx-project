@@ -41,6 +41,7 @@ module.exports = {
       //   http://localhost:88/api/abc  ==>代理给另一个服务器
       // 本地前端---本地后端----代理我们向另一个服务器发送请求
       '/api': {
+        // target: "http://ihrm.itheima.net/",
         target: "http://ihrm-java.itheima.net/",  //我们要代理的地址
         changeOrigin: true  , //是否跨域 值为true 才可以让本地服务器代理我们发送请求
         // http://localhost:88/api/abc===>http://ihrm-java.itheima.net/login

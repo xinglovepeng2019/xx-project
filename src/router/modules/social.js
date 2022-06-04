@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default {
   path: '/social', //路径
-  name: "social",
+  name: "social_securitys",
   component: Layout,
   // 配置二级路由
   children: [

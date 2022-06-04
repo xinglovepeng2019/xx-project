@@ -19,7 +19,11 @@
           <el-dropdown @command="operateDepts">
             <span> 操作<i class="el-icon-arrow-down"></i> </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="add">添加子部门</el-dropdown-item>
+              <el-dropdown-item
+                command="add"
+                :disabled="checkPermission('DR-ADD')"
+                >添加子部门</el-dropdown-item
+              >
               <el-dropdown-item command="edit" v-if="!isRoot"
                 >编辑部门</el-dropdown-item
               >

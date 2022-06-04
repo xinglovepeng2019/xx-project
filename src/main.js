@@ -13,6 +13,8 @@ import store from './store'
 import router from './router'
 import Components from '@/components'
 
+import mixinCheck from '@/mixin/checkPermission'
+
 
 import Print from 'vue-print-nb'
 Vue.use(Print)
@@ -43,6 +45,8 @@ Object.keys(filters).forEach(key => {
   Vue.filter(key,filters[key])
 })
 
+
+Vue.mixin(mixinCheck)
 
 // 注册自定义组件
 Vue.use(Components)

@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default {
   path: '/permission', //路径
-  name: "permission",
+  name: "permissions",
   component: Layout,
   // 配置二级路由
   children: [
